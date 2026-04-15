@@ -1,99 +1,249 @@
-﻿# SaaS Product Feature Adoption & Monetization
+#  SaaS Product Analytics Case Study
 
-## Executive Summary
+---
 
-This project analyzes product usage, feature adoption, customer health, retention, support experience, and monetization opportunities for a B2B SaaS dataset. SQL transformations are written for MySQL 8+, hypothesis testing is implemented in Python, and outputs are designed for Excel or dashboard tools.
+#  Executive Summary
 
-## How To Reproduce
+This project analyzes customer behavior, feature adoption, retention, and revenue drivers for a SaaS product. The objective is to identify key growth levers, reduce churn, and improve monetization through data-driven insights.
 
-1. Create a MySQL database:
+###  Key Highlights:
+
+* **Adoption Rate:** ~71.5% of customers actively use the product
+* **Engagement Gap:** Average health score (~59) indicates moderate engagement
+* **Revenue Driver:** High feature usage strongly correlates with higher MRR
+* **Upgrade Drivers:** Dashboard, Mobile App, and Team Collaboration features (~12% conversion)
+* **Churn Risk:** Significant portion of users in "Needs Attention" segment
+
+---
+
+#  Project Structure
+
+```
+submission/
+├── README.md
+├── metric_definitions.md
+├── sql/
+│   ├── 01_feature_adoption.sql
+│   ├── 02_health_score.sql
+│   ├── 03_cohort_retention.sql
+│   ├── 04_feature_value.sql
+│   └── 05_dashboard_queries.sql
+├── analysis/
+│   ├── feature_analysis.xlsx
+│   ├── health_score_validation.ipynb
+│   └── statistical_tests.R
+├── dashboard/
+│   └── product_health.pbix
+├── stakeholder_report.pdf
+└── appendix/
+    └── methodology.md
+```
+
+---
+
+#  Setup Instructions
+
+### 1. Database Setup
 
 ```sql
-CREATE DATABASE IF NOT EXISTS dataflow_project;
-USE dataflow_project;
+CREATE DATABASE saas_project;
+USE saas_project;
 ```
 
-2. Create/import the four CSV tables using MySQL Workbench:
+---
 
-```text
-customers.csv              -> raw_customers
-feature_usage.csv          -> raw_feature_usage
-subscription_events.csv    -> raw_subscription_events
-support_tickets.csv        -> raw_support_tickets
+### 2. Import Data
+
+Load the following CSV files:
+
+| File                    | Table                   |
+| ----------------------- | ----------------------- |
+| customers.csv           | raw_customers           |
+| feature_usage.csv       | raw_feature_usage       |
+| subscription_events.csv | raw_subscription_events |
+| support_tickets.csv     | raw_support_tickets     |
+
+---
+
+### 3. Run SQL Scripts
+
+Execute in order:
+
+```
+01_feature_adoption.sql  
+02_health_score.sql  
+03_cohort_retention.sql  
+04_feature_value.sql  
+05_dashboard_queries.sql  
 ```
 
-3. Normalize the raw tables into analysis views before running the SQL files. The required normalized views are:
+---
 
-```text
-customers
-feature_usage
-subscription_events
-support_tickets
-```
+#  Key Analyses
 
-4. Run the SQL files in order:
+---
 
-```text
-sql/01_feature_adoption.sql
-sql/02_health_score.sql
-sql/03_cohort_retention.sql
-sql/04_feature_value.sql
-sql/05_dashboard_queries.sql
-```
+##  Feature Adoption
 
-Run `02_health_score.sql` before `05_dashboard_queries.sql`, because the dashboard file uses the `customer_health_scores` view.
+* Measured feature usage across all customers
+* Identified high vs low adoption features
 
-5. Run Python hypothesis testing:
+---
 
-```bash
-cd analysis
-pip install pandas scipy sqlalchemy pymysql
-python statistical_tests.py
-```
+##  Customer Health Scoring
 
-Set the MySQL password first:
+* Built a **0–100 explainable score** using:
 
-```powershell
-$env:MYSQL_PASSWORD='your_mysql_password'
-```
+  * Feature usage
+  * Login activity
+  * Support interaction
+  * Payment behavior
+  * New feature adoption
 
-## Data Reconciliation
+---
 
-The uploaded CSV schema differs from the written case prompt. The analysis uses these mappings:
+##  Cohort Retention
 
-```text
-plan                  -> current_tier
-api_integration       -> API Connectors
-automation            -> Real-time Sync
-ai_insights           -> Custom Transformations
-actions_performed     -> usage_count
-duration_seconds      -> session_duration_seconds
-opened_at             -> created_date
-sentiment text        -> numeric sentiment_score
-```
+* Monthly cohorts based on signup date
+* Measured retention at M1, M3, M6, M12
+* Calculated Net Revenue Retention (NRR)
 
-The main analysis window is Jan-Apr 2025 because the uploaded dataset has stronger usable product activity in that period. Signup cohorts use Jan-Dec 2024.
+---
 
-## Key Findings
+##  Feature Value Analysis
 
-Populate after running SQL:
+* Identified features driving upgrades
+* Analyzed churn behavior and feature abandonment
+* Segmented customers by usage and MRR
 
-1. Highest adoption feature:
-2. Stickiest feature by DAU/MAU:
-3. Health segment with highest churn risk:
-4. Feature with strongest upgrade association:
-5. Highest-priority upsell segment:
+---
 
-## Top Recommendations
+##  Dashboard Metrics
 
-1. Double down on the feature with the strongest adoption, stickiness, and upgrade lift.
-2. Target high-usage starter customers with Professional-tier messaging.
-3. Use the health score to prioritize at-risk outreach.
+* Product Adoption Rate
+* Feature Penetration by Tier
+* Customer Health Distribution
+* Top 100 Churn Risk Customers
+* Revenue Impact of Feature Usage
 
-## Assumptions and Limitations
+---
 
-- Findings are correlational, not causal.
-- `actions_performed > 0` indicates true feature use.
-- `duration_seconds` is used as a session engagement proxy.
-- `growth` and `enterprise` are treated as higher-touch account segments.
-- Support sentiment is converted from text labels into numeric values.
+#  North Star KPIs
+
+| KPI                          | Purpose                        |
+| ---------------------------- | ------------------------------ |
+| Multi-Feature Adoption       | Measures product stickiness    |
+| WAU/MAU Ratio                | Engagement consistency         |
+| Feature → Upgrade Conversion | Monetization efficiency        |
+| Avg Health Score             | Churn prediction signal        |
+| Net Revenue Retention        | Growth from existing customers |
+
+---
+
+# Key Insights
+
+---
+
+##  Product Engagement
+
+* High adoption but moderate engagement depth
+* Opportunity to increase daily/weekly usage
+
+---
+
+##  Revenue Drivers
+
+* High feature usage → significantly higher MRR
+* Strong evidence of product-led growth
+
+---
+
+##  Churn Risk
+
+* Majority of users fall in mid-risk categories
+* Very few "Champions" users
+
+---
+
+##  Feature Performance
+
+Top monetization drivers:
+
+* Dashboard
+* Mobile App
+* Team Collaboration
+
+---
+
+#  Business Recommendations
+
+---
+
+## 1. Double Down on High-Value Features
+
+Focus development and marketing on:
+
+* Dashboard
+* Reporting
+* Mobile App
+
+---
+
+## 2. Improve Feature Adoption
+
+* Guided onboarding
+* In-app feature discovery prompts
+
+---
+
+## 3. Upsell Strategy
+
+Target:
+
+* High usage, low-tier customers
+
+Approach:
+
+* Feature-based upgrade nudges
+
+---
+
+## 4. Reduce Churn Risk
+
+* Monitor "Needs Attention" users
+* Trigger early engagement campaigns
+
+---
+
+## 5. Pricing Optimization
+
+* Introduce feature gating for premium features
+* Improve tier differentiation
+
+---
+
+#  Tools & Technologies
+
+* SQL (MySQL)
+* Excel (Pivot Analysis)
+* Streamlit (Dashboard)
+* Python (Validation)
+
+---
+
+#  Conclusion
+
+The product shows strong adoption and monetization potential. By improving engagement depth, optimizing feature packaging, and targeting high-value users, the business can significantly improve retention and revenue growth.
+
+---
+
+#  Skills Demonstrated
+
+* Advanced SQL Analytics
+* Product & Growth Analytics
+* Cohort Analysis
+* Customer Segmentation
+* KPI Design
+* Business Strategy
+
+---
