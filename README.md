@@ -1,125 +1,99 @@
-#  Product Analytics Case Study: Feature Adoption & Customer Health
+﻿# SaaS Product Feature Adoption & Monetization
 
----
+## Executive Summary
 
-##  Objective
+This project analyzes product usage, feature adoption, customer health, retention, support experience, and monetization opportunities for a B2B SaaS dataset. SQL transformations are written for MySQL 8+, hypothesis testing is implemented in Python, and outputs are designed for Excel or dashboard tools.
 
-Analyze product usage data (Jan–Apr 2024) to evaluate feature adoption, user engagement, and customer health. The goal is to identify drivers of retention and areas of product improvement.
+## How To Reproduce
 
----
+1. Create a MySQL database:
 
-##  How to Reproduce the Analysis
+```sql
+CREATE DATABASE IF NOT EXISTS dataflow_project;
+USE dataflow_project;
+```
 
-1. **Set up environment**
+2. Create/import the four CSV tables using MySQL Workbench:
 
-   ```bash
-   pip install pandas matplotlib streamlit
-   ```
+```text
+customers.csv              -> raw_customers
+feature_usage.csv          -> raw_feature_usage
+subscription_events.csv    -> raw_subscription_events
+support_tickets.csv        -> raw_support_tickets
+```
 
-2. **Run SQL queries**
+3. Normalize the raw tables into analysis views before running the SQL files. The required normalized views are:
 
-   * Navigate to `sql/`
-   * Execute queries in order:
+```text
+customers
+feature_usage
+subscription_events
+support_tickets
+```
 
-     * `01_feature_adoption.sql`
-     * `02_health_score.sql`
-     * `03_cohort_retention.sql`
-     * `04_feature_value.sql`
-     * `05_dashboard_queries.sql`
+4. Run the SQL files in order:
 
-3. **Run Python analysis**
+```text
+sql/01_feature_adoption.sql
+sql/02_health_score.sql
+sql/03_cohort_retention.sql
+sql/04_feature_value.sql
+sql/05_dashboard_queries.sql
+```
 
-   * Open `analysis/health_score_validation.ipynb`
-   * Run all cells to validate health score
+Run `02_health_score.sql` before `05_dashboard_queries.sql`, because the dashboard file uses the `customer_health_scores` view.
 
-4. **Launch dashboard (optional)**
+5. Run Python hypothesis testing:
 
-   ```bash
-   streamlit run dashboard/app.py
-   ```
+```bash
+cd analysis
+pip install pandas scipy sqlalchemy pymysql
+python statistical_tests.py
+```
 
----
+Set the MySQL password first:
 
-##  Key Findings
+```powershell
+$env:MYSQL_PASSWORD='your_mysql_password'
+```
 
-* Feature adoption increased consistently across all features
-* Engagement is shallow:
+## Data Reconciliation
 
-  * Low DAU/MAU ratios
-  * No power users identified
-* Activation rates are extremely low (<2% for most features)
-* `custom_roles` has highest stickiness (high engagement, low adoption)
-* Users explore features but fail to develop habitual usage
+The uploaded CSV schema differs from the written case prompt. The analysis uses these mappings:
 
----
+```text
+plan                  -> current_tier
+api_integration       -> API Connectors
+automation            -> Real-time Sync
+ai_insights           -> Custom Transformations
+actions_performed     -> usage_count
+duration_seconds      -> session_duration_seconds
+opened_at             -> created_date
+sentiment text        -> numeric sentiment_score
+```
 
-##  Top 3 Recommendations (with Expected Impact)
+The main analysis window is Jan-Apr 2025 because the uploaded dataset has stronger usable product activity in that period. Signup cohorts use Jan-Dec 2024.
 
-### 1. Improve Onboarding Experience
+## Key Findings
 
-* Add guided product tours and feature prompts
-   Expected Impact: Increase activation rate by 2–3x
+Populate after running SQL:
 
----
+1. Highest adoption feature:
+2. Stickiest feature by DAU/MAU:
+3. Health segment with highest churn risk:
+4. Feature with strongest upgrade association:
+5. Highest-priority upsell segment:
 
-### 2. Build Habit-Forming Features
+## Top Recommendations
 
-* Introduce alerts, automation, and recurring workflows
-   Expected Impact: Improve DAU/MAU and user retention
+1. Double down on the feature with the strongest adoption, stickiness, and upgrade lift.
+2. Target high-usage starter customers with Professional-tier messaging.
+3. Use the health score to prioritize at-risk outreach.
 
----
+## Assumptions and Limitations
 
-### 3. Upsell High-Engagement Features (`custom_roles`)
-
-* Target users already engaging deeply
-   Expected Impact: Increase revenue and expansion opportunities
-
----
-
-##  Assumptions & Limitations
-
-* Feature release dates not available → approximated using first observed usage
-* Login frequency derived from session activity (proxy)
-* Activation measured relative to available data, not true release timing
-* Health score is rule-based (not optimized via ML)
-
----
-
-##  Data Quality Notes
-
-* Missing values in usage duration handled via filtering (`duration_seconds > 0`)
-* Support ticket missing values interpreted as unresolved tickets
-* Some customers have no feature usage → treated as inactive users
-* Potential bias due to limited observation window (Jan–Apr 2024)
-
----
-
-## Methodology Overview
-
-* Metrics computed at feature and customer level
-* Health score designed as weighted sum of:
-
-  * Usage intensity
-  * Login frequency
-  * Support signals
-  * Payment behavior
-  * Feature adoption
-* Score validated using churn correlation and classification metrics
-
----
-
-##  Deliverables
-
-* SQL queries for all KPIs
-* Feature adoption analysis
-* Customer health scoring model
-* Validation notebook
-* Dashboard (Power BI / Streamlit)
-* Stakeholder report
-* Methodology documentation
-
----
-
-##  Key Takeaway
-
-Despite strong growth in feature adoption, user engagement remains shallow. Improving onboarding and building habit-forming product experiences are critical to driving retention and long-term customer value.
+- Findings are correlational, not causal.
+- `actions_performed > 0` indicates true feature use.
+- `duration_seconds` is used as a session engagement proxy.
+- `growth` and `enterprise` are treated as higher-touch account segments.
+- Support sentiment is converted from text labels into numeric values.
